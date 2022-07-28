@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
-
+import Header from "./components/header/header.component";
+import SearchResults from "./components/search-results/search-results.component"
+import RecipeMessage from "./components/recipe/recipe-message.component";
+import Recipe from "./components/recipe/recipe.component";
+import AddRecipeWindow from "./components/addRecipeWindow/addRecipeWindow.component";
+import {useEffect, useState, useCallback} from "react"
+import {useSelector} from "react-redux"
 function App() {
+  const [hash, setHash] = useState(() => window.location.hash);
+
+  const hashChangeHandler = useCallback(() => {
+    setHash(window.location.hash);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('hashchange', hashChangeHandler);
+    return () => {
+      window.removeEventListener('hashchange', hashChangeHandler);
+    };
+  }, [hashChangeHandler]);
+  const {showModal} = useSelector(state => state.ui)
+  console.log(showModal)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="container">
+        <Header />
+        <SearchResults />
+        {hash ? <Recipe recipeId={hash.slice(1)} /> : <RecipeMessage />}
+        {showModal && <AddRecipeWindow />}
+      </div>
   );
 }
 
